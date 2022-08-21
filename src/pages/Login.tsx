@@ -83,6 +83,10 @@ const Login = () => {
     []
   );
 
+  const SignupButtonClick = () => {
+    nav("/register");
+  };
+
   return (
     <>
       <BackGround>
@@ -118,6 +122,7 @@ const Login = () => {
               <FootButton type="submit" disabled={!(isEmail && isPassword)}>
                 로그인
               </FootButton>
+              <FootButton onClick={SignupButtonClick}>회원가입</FootButton>
             </section>
           </div>
         </form>
@@ -147,6 +152,7 @@ const TextField = styled.input`
 const FootButton = styled.button`
   width: 100px;
   height: 50px;
+  margin-left: 5px;
 `;
 
 const TextP = styled.p`
