@@ -33,6 +33,7 @@ const Login = () => {
             console.log("response:", res);
             if (res.status === 200) {
               nav("/todo");
+              localStorage.setItem("token", res.data.access_token);
             }
           });
       } catch (err: any) {
