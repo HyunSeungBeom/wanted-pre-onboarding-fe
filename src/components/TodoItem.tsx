@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import styled, { css } from "styled-components";
-import { MdDone, MdDelete } from "react-icons/md";
+import { MdDone, MdDelete, MdCreate } from "react-icons/md";
 import { useTodoDispatch } from "../TodoContext";
+import { useMutation, useQueryClient } from "react-query";
+import { TodoApi } from "../api/callApi";
 
 const Remove = styled.div`
   display: flex;
@@ -61,22 +63,66 @@ const Text = styled.div<{ done: boolean }>`
 function TodoItem({
   id,
   done,
-  text,
+  todo,
 }: {
-  id: string;
+  id: number;
   done: boolean;
-  text: string;
+  todo: string;
 }) {
   const dispatch = useTodoDispatch();
-  const onToggle = () => dispatch({ type: "TOGGLE", id });
-  const onRemove = () => dispatch({ type: "REMOVE", id });
+  // const onToggle = () => dispatch({ type: "TOGGLE", id });
+  const [edited, setEdited] = useState<boolean>(false);
+  const [newText, setNewTest] = useState(todo);
+
+  const onChangeEditInput = (e: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
+    setNewTest(e.target.value);
+  };
+
+  const onRemove = () => {
+    deleteTododata.mutate(id);
+  };
+  const onRevise = () => {
+    setEdited(true);
+  };
+
+  const queryClient = useQueryClient();
+
+  const deleteTododata = useMutation(
+    (id: number) => TodoApi.deleteTodoApi(id),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("todo_list");
+      },
+    }
+  );
+
+  const updateTododata = useMutation(
+    (todo: string) => TodoApi.updataTodoApi(id, todo),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("todo_list");
+      },
+    }
+  );
 
   return (
     <TodoItemBlock>
-      <CheckCircle done={done} onClick={onToggle}>
-        {done && <MdDone />}
-      </CheckCircle>
-      <Text done={done}>{text}</Text>
+      <CheckCircle done={done}>{done && <MdDone />}</CheckCircle>
+      <Text done={done}>{todo}</Text>
+      {!done === true ? (
+        edited ? (
+          <Remove onClick={onRevise}>
+            <MdCreate />
+          </Remove>
+        ) : (
+          <Remove onClick={onRevise}>
+            <MdCreate />
+          </Remove>
+        )
+      ) : null}
+
       <Remove onClick={onRemove}>
         <MdDelete />
       </Remove>

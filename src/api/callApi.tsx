@@ -10,7 +10,7 @@ const baseApi = axios.create({
 const callApi = setupInterceptorsTo(baseApi);
 
 const createTodo = async (data: string) => {
-  const res = await callApi.post("/todos", data);
+  const res = await callApi.post("/todos", { todo: data });
   return res;
 };
 
@@ -20,7 +20,7 @@ const getTodoApi = async () => {
 };
 
 const updataTodoApi = async (id: number, data: string) => {
-  const res = await callApi.put(`/todos/${id}`, data);
+  const res = await callApi.put(`/todos/${id}`, { todo: data });
   return res;
 };
 

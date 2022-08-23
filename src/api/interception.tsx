@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import {
   AxiosError,
   AxiosInstance,
@@ -10,11 +9,9 @@ const onRequest = (config: AxiosRequestConfig): AxiosRequestConfig => {
   const localToken = localStorage.getItem("token");
   console.log(localToken);
   if (localToken) {
-    // eslint-disable-next-line no-param-reassign
     config.headers = {
       Authorization: `Bearer ${localToken}`,
-      "Content-Type": "application/json; charset=utf-8",
-      // 'X-Requested-With': 'XMLHttpRequest',
+      "Content-Type": "application/json ",
       Accept: "*/*",
     };
   }

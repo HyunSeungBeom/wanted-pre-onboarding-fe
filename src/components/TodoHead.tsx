@@ -1,5 +1,7 @@
 import React from "react";
+import { useQuery } from "react-query";
 import styled from "styled-components";
+import { TodoApi } from "../api/callApi";
 import { useTodoState } from "../TodoContext";
 
 const TodoHeadBlock = styled.div`
@@ -27,6 +29,14 @@ const TodoHeadBlock = styled.div`
 `;
 
 function TodoHead() {
+  const todo_query = useQuery(["todo_list"], () => TodoApi.getTodoApi(), {
+    onSuccess: (data) => {
+      console.log("success", data);
+    },
+  });
+  if (todo_query.data) {
+    console.log(todo_query.data.data);
+  }
   const todos = useTodoState();
   const undoneTasks = todos.filter((todo: { done: boolean }) => !todo.done);
 

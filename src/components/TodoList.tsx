@@ -1,5 +1,7 @@
 import React from "react";
+import { useQuery } from "react-query";
 import styled from "styled-components";
+import { TodoApi } from "../api/callApi";
 import { useTodoState } from "../TodoContext";
 import TodoItem from "./TodoItem";
 
@@ -12,17 +14,28 @@ const TodoListBlock = styled.div`
 
 function TodoList() {
   const todos = useTodoState();
+  const todo_query = useQuery(["todo_list"], () => TodoApi.getTodoApi(), {
+    onSuccess: (data) => {
+      console.log("success", data);
+    },
+  });
+  if (todo_query.data) {
+    console.log(todo_query.data.data);
+  }
 
   return (
     <TodoListBlock>
-      {todos.map((todo: { id: string; text: string; done: boolean }) => (
-        <TodoItem
-          key={todo.id}
-          id={todo.id}
-          text={todo.text}
-          done={todo.done}
-        />
-      ))}
+      {todo_query.isSuccess &&
+        todo_query.data.data.map(
+          (todo: { id: number; todo: string; isCompleted: boolean }) => (
+            <TodoItem
+              key={todo.id}
+              id={todo.id}
+              todo={todo.todo}
+              done={todo.isCompleted}
+            />
+          )
+        )}
     </TodoListBlock>
   );
 }

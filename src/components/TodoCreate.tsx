@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { MdAdd } from "react-icons/md";
 import { useTodoDispatch, useTodoNextId } from "../TodoContext";
+import { useMutation, useQueryClient } from "react-query";
+import { TodoApi } from "../api/callApi";
 
 const CircleButton = styled.button<{ open: boolean }>`
   background: #38d9a9;
@@ -79,7 +81,7 @@ const Input = styled.input`
 function TodoCreate() {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
-
+  const queryClient = useQueryClient();
   const dispatch = useTodoDispatch();
   const nextId = useTodoNextId();
   const onToggle = () => setOpen(!open);
@@ -87,6 +89,8 @@ function TodoCreate() {
     setValue(e.target.value);
   const onSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault(); // 새로고침 방지
+
+    CreateTododata.mutate(value);
     dispatch({
       type: "CREATE",
       todo: {
@@ -99,6 +103,15 @@ function TodoCreate() {
     setOpen(false);
     nextId.current += 1;
   };
+
+  const CreateTododata = useMutation(
+    (data: string) => TodoApi.createTodo(data),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("todo_list");
+      },
+    }
+  );
 
   return (
     <>
