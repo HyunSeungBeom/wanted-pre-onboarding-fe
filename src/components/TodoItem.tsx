@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import styled, { css } from "styled-components";
 import { MdDone, MdDelete, MdCreate } from "react-icons/md";
-import { useTodoDispatch } from "../TodoContext";
 import { useMutation, useQueryClient } from "react-query";
 import { TodoApi } from "../api/callApi";
 
@@ -60,6 +59,15 @@ const Text = styled.div<{ done: boolean }>`
     `}
 `;
 
+const ReviseInput = styled.input`
+  width: 276px;
+  height: 35px;
+  padding: 5px;
+  box-sizing: border-box;
+  font-size: 17px;
+`;
+
+const InsertForm = styled.form``;
 function TodoItem({
   id,
   done,
@@ -69,22 +77,28 @@ function TodoItem({
   done: boolean;
   todo: string;
 }) {
-  const dispatch = useTodoDispatch();
-  // const onToggle = () => dispatch({ type: "TOGGLE", id });
   const [edited, setEdited] = useState<boolean>(false);
-  const [newText, setNewTest] = useState(todo);
+  const [newText, setNewTest] = useState<string>(todo);
 
-  const onChangeEditInput = (e: {
-    target: { value: React.SetStateAction<string> };
-  }) => {
-    setNewTest(e.target.value);
+  const onSubmit = (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (newText) {
+      updateTododata.mutate(newText);
+    }
+    setEdited(false);
   };
+  const onChange = (e: { target: { value: React.SetStateAction<string> } }) =>
+    setNewTest(e.target.value);
 
   const onRemove = () => {
     deleteTododata.mutate(id);
   };
   const onRevise = () => {
     setEdited(true);
+  };
+
+  const onDone = () => {
+    doneTododata.mutate(!done);
   };
 
   const queryClient = useQueryClient();
@@ -99,7 +113,7 @@ function TodoItem({
   );
 
   const updateTododata = useMutation(
-    (todo: string) => TodoApi.updataTodoApi(id, todo),
+    (todo: string) => TodoApi.updataTodoApi(id, todo, done),
     {
       onSuccess: () => {
         queryClient.invalidateQueries("todo_list");
@@ -107,25 +121,53 @@ function TodoItem({
     }
   );
 
+  const doneTododata = useMutation(
+    (done: boolean) => TodoApi.updataTodoApi(id, todo, done),
+    {
+      onSuccess: () => {
+        console.log("done", done);
+        queryClient.invalidateQueries("todo_list");
+      },
+    }
+  );
+
   return (
     <TodoItemBlock>
-      <CheckCircle done={done}>{done && <MdDone />}</CheckCircle>
-      <Text done={done}>{todo}</Text>
-      {!done === true ? (
+      <CheckCircle done={done} onClick={onDone}>
+        {done && <MdDone />}
+      </CheckCircle>
+      {done === false ? (
         edited ? (
-          <Remove onClick={onRevise}>
-            <MdCreate />
-          </Remove>
+          <InsertForm onSubmit={onSubmit}>
+            <Text done={done}>
+              <ReviseInput
+                autoFocus
+                placeholder="할 일을 수정 후, Enter 를 누르세요"
+                onChange={onChange}
+                value={newText}
+              />
+            </Text>
+          </InsertForm>
         ) : (
-          <Remove onClick={onRevise}>
-            <MdCreate />
-          </Remove>
+          <>
+            <Text done={done}>{todo}</Text>
+            <Remove onClick={onRevise}>
+              <MdCreate />
+            </Remove>
+            <Remove onClick={onRemove}>
+              <MdDelete />
+            </Remove>
+          </>
         )
-      ) : null}
-
-      <Remove onClick={onRemove}>
-        <MdDelete />
-      </Remove>
+      ) : (
+        <>
+          {" "}
+          <Text done={done}>{todo}</Text>
+          <Remove onClick={onRemove}>
+            <MdDelete />
+          </Remove>
+        </>
+      )}
     </TodoItemBlock>
   );
 }

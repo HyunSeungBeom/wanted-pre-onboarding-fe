@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "react-query";
 import styled from "styled-components";
 import { TodoApi } from "../api/callApi";
@@ -13,7 +13,6 @@ const TodoListBlock = styled.div`
 `;
 
 function TodoList() {
-  const todos = useTodoState();
   const todo_query = useQuery(["todo_list"], () => TodoApi.getTodoApi(), {
     onSuccess: (data) => {
       console.log("success", data);

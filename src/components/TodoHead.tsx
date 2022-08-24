@@ -35,10 +35,8 @@ function TodoHead() {
     },
   });
   if (todo_query.data) {
-    console.log(todo_query.data.data);
+    console.log(todo_query.data.data.length);
   }
-  const todos = useTodoState();
-  const undoneTasks = todos.filter((todo: { done: boolean }) => !todo.done);
 
   const today = new Date();
   const dateString = today.toLocaleDateString("ko-KR", {
@@ -48,12 +46,13 @@ function TodoHead() {
   });
   const dayName = today.toLocaleDateString("ko-KR", { weekday: "long" });
 
-  console.log(todos);
   return (
     <TodoHeadBlock>
       <h1>{dateString}</h1>
       <div className="day">{dayName}</div>
-      <div className="tasks-left">할 일 {undoneTasks.length}개 남음</div>
+      <div className="tasks-left">
+        할 일 {todo_query.data?.data.length}개 남음
+      </div>
     </TodoHeadBlock>
   );
 }
