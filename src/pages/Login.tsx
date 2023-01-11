@@ -15,11 +15,11 @@ const Login = () => {
   // 유효성 검사
   const [isEmail, setIsEmail] = useState<boolean>(false);
   const [isPassword, setIsPassword] = useState<boolean>(false);
-  const nav = useNavigate();
+  const navigate = useNavigate();     //url 이동시켜준다.
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+      e.preventDefault(); //새로고침 방지
       try {
         await axios
           .post(
@@ -31,9 +31,9 @@ const Login = () => {
           )
           .then((res) => {
             console.log("response:", res);
-            if (res.status === 200) {
-              nav("/todo");
-              localStorage.setItem("token", res.data.access_token);
+            if (res.status === 200) { 
+              navigate("/todo");
+              localStorage.setItem("token", res.data.access_token);   // response가 있으면 response 안에있는 data를 가져왔는데 거기에 또 access_token을 localStorage에 넣어라.
             }
           });
       } catch (err: any) {
@@ -137,7 +137,6 @@ const BackGround = styled.div`
   align-items: center;
   text-align: center;
   justify-content: center;
-
   margin-top: 200px;
 `;
 
